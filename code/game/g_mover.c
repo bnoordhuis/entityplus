@@ -1476,7 +1476,23 @@ ROTATING
 
 ===============================================================================
 */
+static trType_t G_MovementType (gentity_t *ent, trType_t defaultType) {
+	char *s;
 
+	if (G_SpawnString("type", "", &s)) {
+		if (Q_stricmp(s, "sine")) {
+			return TR_SINE;
+		}
+		if (Q_stricmp(s, "linear")) {
+			return TR_LINEAR;
+		}
+		if (Q_stricmp(s, "gravity")) {
+			return TR_GRAVITY;
+		}
+	}
+
+	return defaultType;
+}
 
 /*QUAKED func_rotating (0 .5 .8) ? START_ON - X_AXIS Y_AXIS
 You need to have an origin brush as part of this entity.  The center of that brush will be
@@ -1488,6 +1504,7 @@ check either the X_AXIS or Y_AXIS box to change that.
 "dmg"		damage to inflict when blocked (2 default)
 "color"		constantLight color
 "light"		constantLight radius
+"type"		movement type: "sine", "linear" or "gravity"; default value is "linear"
 */
 void SP_func_rotating (gentity_t *ent) {
 	//TODO: implement a rotation range/angle and make it triggerable. This allows implementation of an entity that rotates from one position to another after it's triggered
@@ -1496,7 +1513,7 @@ void SP_func_rotating (gentity_t *ent) {
 	}
 
 	// set the axis of rotation
-	ent->s.apos.trType = TR_LINEAR;
+	ent->s.apos.trType = G_MovementType(ent, TR_LINEAR);
 	if ( ent->spawnflags & 4 ) {
 		ent->s.apos.trDelta[2] = ent->speed;
 	} else if ( ent->spawnflags & 8 ) {
@@ -1538,6 +1555,7 @@ Normally bobs on the Z axis
 "dmg"		damage to inflict when blocked (2 default)
 "color"		constantLight color
 "light"		constantLight radius
+"type"		movement type: "sine", "linear" or "gravity"; default value is "sine"
 */
 void SP_func_bobbing (gentity_t *ent) {
 	float		height;
@@ -1556,7 +1574,7 @@ void SP_func_bobbing (gentity_t *ent) {
 
 	ent->s.pos.trDuration = ent->speed * 1000;
 	ent->s.pos.trTime = ent->s.pos.trDuration * phase;
-	ent->s.pos.trType = TR_SINE;
+	ent->s.pos.trType = G_MovementType(ent, TR_SINE);
 
 	// set the axis of bobbing
 	if ( ent->spawnflags & 1 ) {
@@ -1587,6 +1605,7 @@ Pendulum frequency is a physical constant based on the length of the beam and gr
 "dmg"		damage to inflict when blocked (2 default)
 "color"		constantLight color
 "light"		constantLight radius
+"type"		movement type: "sine", "linear" or "gravity"; default value is "sine"
 */
 void SP_func_pendulum(gentity_t *ent) {
 	float		freq;
@@ -1619,6 +1638,6 @@ void SP_func_pendulum(gentity_t *ent) {
 
 	ent->s.apos.trDuration = 1000 / freq;
 	ent->s.apos.trTime = ent->s.apos.trDuration * phase;
-	ent->s.apos.trType = TR_SINE;
+	ent->s.apos.trType = G_MovementType(ent, TR_SINE);
 	ent->s.apos.trDelta[2] = speed;
 }
