@@ -922,15 +922,23 @@ NOMONSTER	monsters will not trigger this door
 "color"		constantLight color
 "light"		constantLight radius
 "health"	if set, the door must be shot open
+"startsound"	if set, the sound to play when the door starts moving
+"endsound"	if set, the sound to play when the door has stopped moving
 */
 void SP_func_door (gentity_t *ent) {
+	char	*startsound;
+	char	*endsound;
 	vec3_t	abs_movedir;
 	float	distance;
 	vec3_t	size;
 	float	lip;
 
-	ent->sound1to2 = ent->sound2to1 = G_SoundIndex("sound/movers/doors/dr1_strt.wav");
-	ent->soundPos1 = ent->soundPos2 = G_SoundIndex("sound/movers/doors/dr1_end.wav");
+	startsound = endsound = NULL;
+	G_SpawnString("startsound", "sound/movers/doors/dr1_strt.wav", &startsound);
+	G_SpawnString("endsound", "sound/movers/doors/dr1_end.wav", &endsound);
+
+	ent->sound1to2 = ent->sound2to1 = G_SoundIndex(startsound);
+	ent->soundPos1 = ent->soundPos2 = G_SoundIndex(endsound);
 
 	ent->blocked = Blocked_Door;
 
